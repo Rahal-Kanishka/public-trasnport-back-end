@@ -5,6 +5,8 @@ var mongoose = require('mongoose');
 var app = express();
 var admin = require("./admin.js");
 var driverModule = require("./driver.js");
+var busModule = require("./bus.js");
+var userModule = require("./user.js");
 
 
 // model before defning routes
@@ -17,6 +19,8 @@ var Driver = mongoose.model("Driver", driverSchema);*/
 
 app.use('/admin',admin);
 app.use('/driver',driverModule);
+app.use('/bus',busModule);
+app.use('/user',userModule);
 
 mongoose.connect('mongodb://localhost/transport_db', { useUnifiedTopology: true, useNewUrlParser: true });
 
