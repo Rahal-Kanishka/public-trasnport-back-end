@@ -15,6 +15,7 @@ var driverSchema = mongoose.Schema({
 var Driver = mongoose.model("Driver", driverSchema);
 
 router.get('/:name', function(req,res) {
+   console.log('get driver',req.params.name);
 	Driver.findOne({userName: req.params.name}, function(err,obj) { 
 		console.log(obj);
 		res.send(obj);

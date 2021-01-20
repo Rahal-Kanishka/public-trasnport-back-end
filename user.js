@@ -2,7 +2,8 @@ var express = require('express');
 var mongoose = require('mongoose');
 var bcrypt = require('bcryptjs');
 var bodyParser = require('body-parser');
-
+var secretkey = require('./config/configurations').JWTKey;
+var jwt = require('jsonwebtoken');
 
 const User = require('./models/User');
 var router = express.Router();
@@ -10,13 +11,26 @@ var router = express.Router();
 var jsonParser = bodyParser.json()
 
 // get user by name
-router.get('/:name', function (req, res) {
-	console.log('name: ', req.params.name);
-	User.findOne({ username: req.params.name }, function (err, obj) {
-		console.log(obj);
-		res.send(obj);
-		return obj;
+router.get('/:name', verifyToken, function (req, res) {
+	console.log('userName: ', req.params.name);
+	jwt.verify(req.token,secretkey,(err,authData)=>{
+		if(err) {
+			console.log('invalid token');
+			res.status(403).send({
+				result: false,
+				data: 'invalid Token'
+			})
+		} else {
+			// valid token
+			console.log('valid token');
+			User.findOne({ userName: req.params.name }, function (err, obj) {
+				console.log(obj);
+				res.send(obj);
+				return obj;
+			});
+		}
 	});
+
 
 });
 
@@ -97,19 +111,28 @@ router.post('/login', jsonParser, function (req, res) {
 		User.findOne({ userName: userName }, function (err, userObj) {
 			if (userObj) {
 				// hashing password
-				bcrypt.compare(password,userObj.password,(err,isMatch)=>{
-					if(err) throw err;
-					if(isMatch){
-						res.status(200).send({
+				bcrypt.compare(password, userObj.password, (err, isMatch) => {
+					if (err) throw err;
+					if (isMatch) {
+						// creating JWT token using retrieved user-object as payload
+						jwt.sign({ userObj }, secretkey, (err, token) => {
+							res.status(200).send({
+								result: true,
+								data: userObj,
+								token: token
+							});
+						});
+
+						/* res.status(200).send({
 							result: true,
 							data: userObj
-						});
+						}); */
 					} else {
 						errors.push({ msg: 'Invalid Username or password' });
-							res.status(400).send({
-								result: true,
-								data: errors
-							});
+						res.status(400).send({
+							result: true,
+							data: errors
+						});
 					}
 				});
 			} else {
@@ -123,6 +146,23 @@ router.post('/login', jsonParser, function (req, res) {
 	}
 
 });
+
+// middleware to verify JWT token
+function verifyToken(req, res, next) {
+	const bearerHeader = req.headers['authorization'];
+
+	if (typeof bearerHeader !== 'undefined') {
+		bearerToken = bearerHeader.split(' ')[1];
+		req.token = bearerToken;
+		next();
+	} else {
+		console.log('missing token in header');
+		res.status(403).send({
+			result: false,
+			data: 'missing token in header'
+		})
+	}
+}
 
 
 module.exports = router;
