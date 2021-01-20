@@ -7,6 +7,7 @@ var admin = require("./admin.js");
 var driverModule = require("./driver.js");
 var busModule = require("./bus.js");
 var userModule = require("./user.js");
+var dbURI = require('./config/configurations').dbURI;
 
 
 // model before defning routes
@@ -22,7 +23,7 @@ app.use('/driver',driverModule);
 app.use('/bus',busModule);
 app.use('/user',userModule);
 
-mongoose.connect('mongodb://localhost/transport_db', { useUnifiedTopology: true, useNewUrlParser: true });
+mongoose.connect(dbURI, { useUnifiedTopology: true, useNewUrlParser: true });
 
 const connection = mongoose.connection;
 
