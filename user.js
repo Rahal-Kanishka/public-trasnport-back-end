@@ -6,6 +6,7 @@ var secretkey = require('./config/configurations').JWTKey;
 var jwt = require('jsonwebtoken');
 
 const User = require('./models/User');
+const Driver = require('./models/Driver');
 var router = express.Router();
 // create application/json parser
 var jsonParser = bodyParser.json()
@@ -13,8 +14,8 @@ var jsonParser = bodyParser.json()
 // get user by name
 router.get('/:name', verifyToken, function (req, res) {
 	console.log('userName: ', req.params.name);
-	jwt.verify(req.token,secretkey,(err,authData)=>{
-		if(err) {
+	jwt.verify(req.token, secretkey, (err, authData) => {
+		if (err) {
 			console.log('invalid token');
 			res.status(403).send({
 				result: false,
@@ -52,7 +53,7 @@ router.post('/register', jsonParser, function (req, res) {
 			data: errors
 		});
 	} else {
-		// check username aready exits
+		// check username already exits
 		User.findOne({ userName: userName }, function (err, obj) {
 			console.log(obj);
 			if (obj) {
@@ -73,14 +74,24 @@ router.post('/register', jsonParser, function (req, res) {
 					address,
 					type
 				});
-				// hashng the password
+				// hashing the password
 				bcrypt.genSalt(10, (err, salt) => {
 					bcrypt.hash(newUser.password, salt, (err, hash) => {
 						if (err) throw err;
 						// update password
 						newUser.password = hash;
+
 						// save to db
 						newUser.save().then(user => {
+							//if the user type is a driver, create a driver profile
+							if (user.type.name === 'Driver') {
+								const newDriver = new Driver(user._id, "0", 0);
+								newDriver.save().then(driver => {
+									console.log("Driver profile created for UserID: ", user._id)
+								})
+
+							}
+
 							res.status(200).send({
 								result: true,
 								data: user

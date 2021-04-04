@@ -8,5 +8,7 @@ var driverSchema = mongoose.Schema({
     nationality: String,
     rating: String,
     trips: Number
- });
+ },{ collection: 'driver' });
  var Driver = mongoose.model("Driver", driverSchema);
+
+module.exports = Driver;
