@@ -1,7 +1,8 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var router = express.Router();
-const Driver = require('./models/Driver');
+const driverProfileModel = require('./models/DriverProfile');
+const userModel = require('./models/User');
 const RouteModel = require('./models/Route');
 const journeyModel = require('./models/Journey');
 const url = require('url');
@@ -25,6 +26,36 @@ router.get('/driver_location', async function (req, res) {
 	console.log('response: ', returnData);
 	res.send(returnData);
 	return returnData;
+});
+
+router.get('/current_drivers', async function (req, res) {
+	let parsedUrl = url.parse(req.url);
+	let parsedQs = querystring.parse(parsedUrl.query);
+	console.log('get route id', parsedQs.route_id);
+	var response = await getDriversByRoute(parsedQs.route_id);
+	console.log('response: ', response);
+	res.send(response);
+	return response;
+});
+
+router.get('/driver', async function (req, res) {
+	let parsedUrl = url.parse(req.url);
+	let parsedQs = querystring.parse(parsedUrl.query);
+	console.log('get driver by id', parsedQs.driver_id);
+	var response = await getDriverByID(parsedQs.driver_id);
+	console.log('response: ', response);
+	res.send(response);
+	return response;
+});
+
+router.get('/driver_profile', async function (req, res) {
+	let parsedUrl = url.parse(req.url);
+	let parsedQs = querystring.parse(parsedUrl.query);
+	console.log('get driver by id', parsedQs.driver_id);
+	var response = await getDriverProfileByDriverID(parsedQs.driver_id);
+	console.log('response: ', response);
+	res.send(response);
+	return response;
 });
 
 /**
@@ -85,5 +116,35 @@ async function UpdateDriverRealtimeLocation(driver_id, route_id, lat, lng, speed
 
 }
 
+async function getDriversByRoute(route_id) {
+
+	return journeyModel.findOne({ route_id: route_id }, function (err, obj) {
+		if (err) {
+			console.log("cant find route")
+		} else {
+			console.log("routfound: ",obj);
+		}
+	});
+}
+
+async function getDriverByID(driver_id) {
+	return userModel.findById(driver_id, function (err, obj) {
+		if (err) {
+			console.log("cant find route")
+		} else {
+			console.log("rout found: ",obj);
+		}
+	});
+}
+
+async function getDriverProfileByDriverID(driver_id) {
+	return driverProfileModel.findOne({driver_id: driver_id} , function (err, obj) {
+		if (err) {
+			console.log("cant find route")
+		} else {
+			console.log("rout found: ",obj);
+		}
+	});
+}
 
 module.exports = router;

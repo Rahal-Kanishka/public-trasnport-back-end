@@ -6,12 +6,15 @@ var secretkey = require('./config/configurations').JWTKey;
 var jwt = require('jsonwebtoken');
 
 const User = require('./models/User');
-const Driver = require('./models/Driver');
+const Driver = require('./models/DriverProfile');
 var router = express.Router();
 // create application/json parser
 var jsonParser = bodyParser.json()
+const url = require('url');
+const querystring = require('querystring');
 
 // get user by name
+/*
 router.get('/:name', verifyToken, function (req, res) {
 	console.log('userName: ', req.params.name);
 	jwt.verify(req.token, secretkey, (err, authData) => {
@@ -33,6 +36,19 @@ router.get('/:name', verifyToken, function (req, res) {
 	});
 
 
+
+});
+
+ */
+
+router.get('/user', async function (req, res) {
+	let parsedUrl = url.parse(req.url);
+	let parsedQs = querystring.parse(parsedUrl.query);
+	console.log('get user by id', parsedQs.user_id);
+	var response = await getUserByID(parsedQs.user_id);
+	console.log('response: ', response);
+	res.send(response);
+	return response;
 });
 
 // user registration
@@ -173,6 +189,16 @@ function verifyToken(req, res, next) {
 			data: 'missing token in header'
 		})
 	}
+}
+
+async function getUserByID(user_id) {
+	return User.findById(user_id, function (err, obj) {
+		if (err) {
+			console.log("cant find user")
+		} else {
+			console.log("user found: ",obj);
+		}
+	});
 }
 
 

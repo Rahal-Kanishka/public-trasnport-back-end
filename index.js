@@ -10,15 +10,6 @@ var userModule = require("./user.js");
 var busRouteModule = require("./bus-route.js");
 var dbURI = require('./config/configurations').dbURI;
 
-
-// model before defning routes
-/*var driverSchema = mongoose.Schema({
-   name: String,
-   age: Number,
-   nationality: String
-});
-var Driver = mongoose.model("Driver", driverSchema);*/
-
 app.use('/admin',admin);
 app.use('/driver',driverModule);
 app.use('/bus',busModule);
