@@ -7,7 +7,8 @@ var journeySchema = mongoose.Schema({
         location: Object,
         speed: Object,
         rotation: Object,
-        journey_started: Boolean
+        updated_time: String,
+        journey_ongoing: Boolean
     }]
 }, { collection: 'journey'});
 

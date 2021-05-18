@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 // driver model 
 var driverProfileSchema = mongoose.Schema({
     driver_id: String,
+    route_id: String,
     max_ratings: String,
     rating: String,
     trips: Number
