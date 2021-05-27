@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 // driver model 
 var driverProfileSchema = mongoose.Schema({
-    driver_id: String,
+    driver_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     route_id: String,
     max_ratings: String,
     rating: String,

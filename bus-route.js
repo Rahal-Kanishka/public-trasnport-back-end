@@ -28,7 +28,7 @@ router.get('/route_by_id', function (req, res) {
 });
 
 router.get('/all_routes', function(req,res) {
-    BusRoute.find({}, function(err,obj) {
+    BusRoute.find({}, '_id name', function(err,obj) {
         console.log(obj);
         res.send(obj);
         return obj;

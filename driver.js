@@ -20,6 +20,23 @@ var jsonParser = bodyParser.json()
 	
 });*/
 
+router.get('/all', async function (req, res) {
+	var returnData = await getAllDriversWithProfile();
+	console.log('response: ', returnData);
+	res.send(returnData);
+	return returnData;
+});
+
+router.get('/by_route', async function (req, res) {
+	let parsedUrl = url.parse(req.url);
+	let parsedQs = querystring.parse(parsedUrl.query);
+	console.log('get drivers by route id', parsedQs.route_id);
+	var returnData = await getDriversWithProfileByRoute(parsedQs.route_id);
+	console.log('response: ', returnData);
+	res.send(returnData);
+	return returnData;
+});
+
 router.get('/driver_location', async function (req, res) {
 	let parsedUrl = url.parse(req.url);
 	let parsedQs = querystring.parse(parsedUrl.query);
@@ -79,6 +96,18 @@ router.put('/journey_status', jsonParser, async function (req, res) {
 	res.send(returnData);
 	return returnData;
 });
+
+async function getAllDriversWithProfile(route_id, request_count) {
+	var response = await driverProfileModel.find().populate('driver_id');
+	console.log('drivers: ', response);
+	return response;
+}
+
+async function getDriversWithProfileByRoute(route_id) {
+	var response = await driverProfileModel.find({route_id: route_id}).populate('driver_id');
+	console.log('drivers: ', response);
+	return response;
+}
 
 /**
  * get real time of the driver for given route id
