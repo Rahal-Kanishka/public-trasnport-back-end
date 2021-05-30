@@ -15,6 +15,16 @@ router.get('/all', async function (req, res) {
     return returnData;
 });
 
+router.get('/by_user', async function (req, res) {
+    let parsedUrl = url.parse(req.url);
+    let parsedQs = querystring.parse(parsedUrl.query);
+    console.log('get complaints by user id', parsedQs.user_id);
+    var returnData = await getAllComplaintsByUser(parsedQs.user_id);
+    console.log('response: ', returnData);
+    res.send(returnData);
+    return returnData;
+});
+
 router.post('/add_complaint',jsonParser, async function (req, res) {
     console.log('body: ', req.body);
     let errors = [];
@@ -33,6 +43,17 @@ router.post('/add_complaint',jsonParser, async function (req, res) {
 
 async function getAllComplaints() {
     var response = await complaintModel.find().populate('user_id');
+    console.log('complaints: ', response);
+    return response;
+}
+
+/**
+ * Get complaints recorded by the given user
+ * @param userID
+ * @returns {Promise<void>}
+ */
+async function getAllComplaintsByUser(userID) {
+    var response = await complaintModel.find({user_id: userID}).populate('user_id');
     console.log('complaints: ', response);
     return response;
 }
