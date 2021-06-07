@@ -204,11 +204,11 @@ async function getDriverByID(driver_id) {
 }
 
 async function getDriverProfileByDriverID(driver_id) {
-	return driverProfileModel.findOne({driver_id: driver_id} , function (err, obj) {
+	return driverProfileModel.findOne({driver_id: mongoose.Types.ObjectId(driver_id)}, function (err, obj) {
 		if (err) {
-			console.log("cant find route")
+			console.log("cant find driver profile")
 		} else {
-			console.log("rout found: ",obj);
+			console.log("diver profile found: ",obj);
 		}
 	});
 }
